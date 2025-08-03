@@ -6,7 +6,6 @@ initramfs.cpio.gz
 img/*
 initrd
 tmpini
-*.c
 *.o
 schorl/init/init
 schorl/initramfs/*
