@@ -1,0 +1,5 @@
+schorl.img
+linux/kernel
+BOOTX64.EFI
+initramfs.cpio.gz
+img/*
