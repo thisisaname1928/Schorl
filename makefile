@@ -4,11 +4,14 @@ TEST_ISO=schorl.iso
 test: testIso
 	@qemu-system-x86_64 -pflash x64/OVMF.4m.fd $(TEST_ISO) -enable-kvm -m 1G
 
-testIso:
+testIso: initramfs
 	@cp schorl/boot/grub.cfg ./img/boot/grub/
 	@cp linux/kernel ./img/boot/
-	@cp initramfs.cpio.gz ./img/boot/
+	@cp initrd ./img/boot/
 	@grub-mkrescue -o $(TEST_ISO) img
+
+initramfs:
+	@cd schorl/initramfs && find . -depth -print0 | cpio --null -ov --format=newc | gzip -9 > ../../initrd
 
 clean:
 	@rm $(shell find ./img -type f)

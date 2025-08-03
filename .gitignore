@@ -4,3 +4,4 @@ linux/kernel
 BOOTX64.EFI
 initramfs.cpio.gz
 img/*
+initrd
