@@ -7,6 +7,7 @@ test: testIso
 	@qemu-system-x86_64 -cdrom $(TEST_ISO) -enable-kvm -m 1G
 
 testIso: initramfs
+	@mkdir -p img/boot/grub
 	@cp schorl/boot/grub.cfg ./img/boot/grub/
 	@cp linux/kernel ./img/boot/
 	@cp initrd ./img/boot/
