@@ -14,6 +14,7 @@ testIso: initramfs
 	@grub-mkrescue -o $(TEST_ISO) img
 
 initramfs: buildSubDir
+	@mkdir -p schorl/initramfs
 	@mkdir -p schorl/initramfs/proc
 	@mkdir -p schorl/initramfs/dev
 	@mkdir -p schorl/initramfs/sys
