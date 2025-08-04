@@ -1,5 +1,6 @@
 #include "shell/shell.h"
 #include "syscall.h"
+#include <dirent.h>
 #include <linux/fb.h>
 #include <stdio.h>
 #include <sys/ioctl.h>
@@ -19,9 +20,11 @@ int main() {
   s = mount("sysfs", "/sys", "sysfs", 0, "");
   CHECK(s, "Unable to mount /sys");
 
-  printf("\033[2J\033[HHII\n");
+  printf("\033[2J\033[H\n");
 
   int f = open("/dev/fb0", O_RDWR);
+  DIR *currentDir;
+  currentDir = opendir("/");
 
   struct fb_fix_screeninfo finfo;
   struct fb_var_screeninfo vinfo;

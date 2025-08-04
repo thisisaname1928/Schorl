@@ -1,3 +1,4 @@
+#include <dirent.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -18,14 +19,62 @@ int test(int n, char **argv) {
   return 0;
 }
 
+int ls(int n, char **argv) {
+  DIR *d = opendir(".");
+  struct dirent *entry = readdir(d);
+  while (entry != NULL) {
+    if ((entry->d_type & DT_DIR) == DT_DIR)
+      printf("\e[0;34m%s\e[0m\n", entry->d_name);
+    else
+      printf("%s\n", entry->d_name);
+    entry = readdir(d);
+  }
+
+  closedir(d);
+  return 0;
+}
+
+int cd(int n, char **argv) {
+  if (n > 1) {
+    chdir(argv[1]);
+  } else {
+    chdir("/");
+  }
+
+  return 0;
+}
+
+int clear(int n, char **argv) {
+  printf("\033[2J\033[H");
+  return 0;
+}
+
+int shellinfo(int n, char **argv) {
+  printf("this is internal schorl init shell!\n");
+  return 0;
+}
+
+int help(int n, char **argv);
+
 typedef struct {
   int (*funcPtr)(int, char **);
   const char *cmd;
 } command;
 
-const command cmds[] = {test, "test"};
+const command cmds[] = {{test, "test"},   {ls, "ls"},          {cd, "cd"},
+                        {clear, "clear"}, {shellinfo, "info"}, {help, "help"}};
 const uint64_t numberOfCommands = sizeof(cmds) / sizeof(command);
 
+int help(int n, char **argv) {
+  printf("Available commands: ");
+  for (uint64_t i = 0; i < numberOfCommands; i++) {
+    printf("%s ", cmds[i].cmd);
+  }
+  printf("\n");
+  return 0;
+}
+
+extern DIR *currentDir;
 void executeShell(const char *cmd) {
   char *command = malloc(strlen(cmd));
   if (command == NULL) {
@@ -102,7 +151,8 @@ void shell() {
   while (true) {
     int i = 0;
     buffer[0] = '\n';
-    printf("> ");
+
+    printf("shell> ");
     fflush(stdout);
     scanf("%1022[^\n]s", buffer);
     getchar();
