@@ -1,6 +1,7 @@
 schorl.img
 schorl.iso
 linux/kernel
+linux/modules/*
 BOOTX64.EFI
 initramfs.cpio.gz
 img/*

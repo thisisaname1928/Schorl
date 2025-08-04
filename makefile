@@ -21,7 +21,8 @@ initramfs: buildSubDir
 	@mkdir -p schorl/initramfs/proc
 	@mkdir -p schorl/initramfs/dev
 	@mkdir -p schorl/initramfs/sys
-	@cd schorl/initramfs && find . -depth -print0 | cpio --null -ov --format=newc > ../../initrd
+	@cp -r linux/modules schorl/initramfs/
+	@cd schorl/initramfs && find . -print0 | cpio --null -ov --format=newc > ../../initrd
 
 buildSubDir:
 	@$(foreach dir, $(SUB_DIR), $(MAKE) -C $(dir))

@@ -17,7 +17,7 @@ char *parseCmdline(const char *tag, const char *cmdline) {
     i++;
     uint64_t n = 1;
     char *value = malloc(n + 1);
-    while (cmdline[i] != ' ' && i < strlen(cmdline)) {
+    while (cmdline[i] != ' ' && i < strlen(cmdline) && cmdline[i] != '\n') {
       value[n - 1] = cmdline[i];
       i++;
       n++;
@@ -28,5 +28,5 @@ char *parseCmdline(const char *tag, const char *cmdline) {
 
     return value;
   } else
-    return NULL;
+    return "";
 }

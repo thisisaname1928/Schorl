@@ -1,4 +1,5 @@
 #include "cmdline/cmdline.h"
+#include "detectfs/detectfs.h"
 #include "shell/shell.h"
 #include "syscall.h"
 #include <dirent.h>
@@ -6,6 +7,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -15,6 +17,8 @@
     printf(msg);
 
 int console;
+const char *kernelCmdline;
+const char *modulesPath;
 
 uint64_t getFileSize(const char *fn) {
   struct stat info;
@@ -22,6 +26,21 @@ uint64_t getFileSize(const char *fn) {
   if (stat(fn, &info) == 0) {
     return info.st_size;
   }
+
+  return 0;
+}
+
+int loadModule(const char *path) {
+  char *rpath = malloc(strlen(modulesPath) + strlen(path));
+  strcpy(rpath, modulesPath);
+  strcat(rpath, path);
+
+  int f = open(rpath, 0); // readonly
+  if (f == -1)
+    return -1;
+  int s = finit_modules(f, getFileSize(path), NULL);
+  CHECK(s, "load module failed\n")
+  close(f);
 
   return 0;
 }
@@ -58,15 +77,24 @@ int main() {
     printf("SOMETHINGS WRONG WITH SYSTEM, CAN'T READ /proc/cmdline ");
   }
   uint64_t size = getFileSize("/proc/cmdline");
-  char *buffer = malloc(size);
-  fread(buffer, size, 1, procCmdLine);
+  char *kernelCmdline = malloc(size);
+  fread(kernelCmdline, size, 1, procCmdLine);
 
-  char *root = parseCmdline("root", buffer);
+  modulesPath = parseCmdline("modules", kernelCmdline);
+
+  char *root = parseCmdline("root", kernelCmdline);
   s = mkdir("/mnt/root", 0700);
   CHECK(s, "cant mkdir temporary root!\n");
-  s = mount(root, "/mnt/root", "", 0, 0);
+  s = mount(root, "/mnt/root", detectFileSystem(root), 0, 0);
   CHECK(s, "cant mount root\n");
+  printf("%s\n", detectFileSystem(root));
   free(root);
+
+  s = loadModule("fs/isofs/isofs.ko");
+  CHECK(s, "SUS\n")
+  s = loadModule("driver/scsi/sr_mod.ko");
+  CHECK(s, "SUS\n")
+
   shell();
   for (;;) {
   }

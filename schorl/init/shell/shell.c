@@ -24,9 +24,9 @@ int ls(int n, char **argv) {
   struct dirent *entry = readdir(d);
   while (entry != NULL) {
     if ((entry->d_type & DT_DIR) == DT_DIR)
-      printf("\e[0;34m%s\e[0m\n", entry->d_name);
+      printf("\e[0;34m%s\e[0m ", entry->d_name);
     else
-      printf("%s\n", entry->d_name);
+      printf("%s ", entry->d_name);
     entry = readdir(d);
   }
 
@@ -54,6 +54,26 @@ int shellinfo(int n, char **argv) {
   return 0;
 }
 
+extern uint64_t getFileSize(const char *fn);
+int cat(int n, char **argv) {
+  if (n < 2)
+    return 0;
+
+  FILE *f = fopen(argv[1], "r");
+  if (f == NULL)
+    return -1;
+
+  uint64_t size = getFileSize(argv[1]);
+  char *buffer = malloc(size + 1);
+  buffer[size] = 0; // and this to avoid segfault
+  fread(buffer, size, 1, f);
+  printf("%s", buffer);
+
+  free(buffer);
+  fclose(f);
+  return 0;
+}
+
 int help(int n, char **argv);
 
 typedef struct {
@@ -62,7 +82,8 @@ typedef struct {
 } command;
 
 const command cmds[] = {{test, "test"},   {ls, "ls"},          {cd, "cd"},
-                        {clear, "clear"}, {shellinfo, "info"}, {help, "help"}};
+                        {clear, "clear"}, {shellinfo, "info"}, {help, "help"},
+                        {cat, "cat"}};
 const uint64_t numberOfCommands = sizeof(cmds) / sizeof(command);
 
 int help(int n, char **argv) {
