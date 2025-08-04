@@ -20,7 +20,8 @@ int main() {
   s = mount("sysfs", "/sys", "sysfs", 0, "");
   CHECK(s, "Unable to mount /sys");
 
-  printf("\033[2J\033[H\n");
+  printf("\033[2J\033[H");
+  executeShell("info");
 
   int f = open("/dev/fb0", O_RDWR);
   DIR *currentDir;

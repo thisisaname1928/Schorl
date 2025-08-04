@@ -50,7 +50,7 @@ int clear(int n, char **argv) {
 }
 
 int shellinfo(int n, char **argv) {
-  printf("this is internal schorl init shell!\n");
+  printf("this is an internal Schorl init shell!\n");
   return 0;
 }
 
