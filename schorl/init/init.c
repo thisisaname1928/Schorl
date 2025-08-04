@@ -1,27 +1,21 @@
 #include "syscall.h"
-#include <stdint.h>
-#include <syscall.h>
+#include <stdio.h>
 
-int console;
+#define CHECK(val, msg)                                                        \
+  if (val == -1)                                                               \
+    printf(msg);
 
-void print(const char *str) {
-  uint64_t i = 0;
-  for (; str[i] != 0; i++) {
-  }
-
-  write(console, str, i);
-}
-
-void _start() {
+int main() {
   int s = mount("proc", "/proc", "proc", 0, "");
+  CHECK(s, "Unable to mount /proc");
   s = mount("devtmpfs", "/dev", "devtmpfs", 0, "");
+  CHECK(s, "Unable to mount /dev");
   s = mount("sysfs", "/sys", "sysfs", 0, "");
+  CHECK(s, "Unable to mount /sys");
 
-  console = open("/dev/console", O_NOCTTY | O_RDWR);
+  printf("HII\n");
 
-  print("HI THIS IS SCHORL\n\r");
-
-  if (s != -1)
-    for (;;) {
-    }
+  for (;;) {
+  }
+  return 0;
 }

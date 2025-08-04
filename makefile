@@ -3,7 +3,6 @@ IMG_FILES=$(shell find ./img)
 TEST_ISO=schorl.iso
 SUB_DIR=schorl/init
 test: testIso
-	#@qemu-system-x86_64 -pflash x64/OVMF.4m.fd $(TEST_ISO) -enable-kvm -m 1G
 	@qemu-system-x86_64 -cdrom $(TEST_ISO) -enable-kvm -m 1G
 
 testIso: initramfs
