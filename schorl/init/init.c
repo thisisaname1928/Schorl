@@ -13,7 +13,7 @@ int main() {
   s = mount("sysfs", "/sys", "sysfs", 0, "");
   CHECK(s, "Unable to mount /sys");
 
-  printf("HII\n");
+  printf("\033[2J\033[HHII\n");
 
   for (;;) {
   }

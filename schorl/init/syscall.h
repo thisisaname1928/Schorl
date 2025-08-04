@@ -11,5 +11,6 @@ int mount(const char *source, const char *target, const char *filesystemtype,
 void check(uint64_t val);
 int open(const char *pathname, int flags, ...);
 i64 write(int fd, const void *buf, u64 count);
+int chroot(const char *path);
 
 #endif
