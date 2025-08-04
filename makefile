@@ -17,6 +17,7 @@ testIso: initramfs
 
 initramfs: buildSubDir
 	@mkdir -p schorl/initramfs
+	@mkdir -p schorl/initramfs/mnt
 	@mkdir -p schorl/initramfs/proc
 	@mkdir -p schorl/initramfs/dev
 	@mkdir -p schorl/initramfs/sys

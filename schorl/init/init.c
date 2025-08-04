@@ -1,9 +1,13 @@
+#include "cmdline/cmdline.h"
 #include "shell/shell.h"
 #include "syscall.h"
 #include <dirent.h>
 #include <linux/fb.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/ioctl.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #define CHECK(val, msg)                                                        \
@@ -11,6 +15,16 @@
     printf(msg);
 
 int console;
+
+uint64_t getFileSize(const char *fn) {
+  struct stat info;
+
+  if (stat(fn, &info) == 0) {
+    return info.st_size;
+  }
+
+  return 0;
+}
 
 int main() {
   int s = mount("proc", "/proc", "proc", 0, "");
@@ -38,8 +52,22 @@ int main() {
 
   console = open("/dev/console", 0);
 
-  shell();
+  // read /proc/cmdline for root
+  FILE *procCmdLine = fopen("/proc/cmdline", "rb");
+  if (procCmdLine == NULL) {
+    printf("SOMETHINGS WRONG WITH SYSTEM, CAN'T READ /proc/cmdline ");
+  }
+  uint64_t size = getFileSize("/proc/cmdline");
+  char *buffer = malloc(size);
+  fread(buffer, size, 1, procCmdLine);
 
+  char *root = parseCmdline("root", buffer);
+  s = mkdir("/mnt/root", 0700);
+  CHECK(s, "cant mkdir temporary root!\n");
+  s = mount(root, "/mnt/root", "", 0, 0);
+  CHECK(s, "cant mount root\n");
+  free(root);
+  shell();
   for (;;) {
   }
   return 0;
