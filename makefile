@@ -5,6 +5,9 @@ SUB_DIR=schorl/init
 test: testIso
 	@qemu-system-x86_64 -cdrom $(TEST_ISO) -enable-kvm -m 1G
 
+quickTest:
+	@qemu-system-x86_64 -cdrom $(TEST_ISO) -enable-kvm -m 1G
+
 testIso: initramfs
 	@mkdir -p img/boot/grub
 	@cp schorl/boot/grub.cfg ./img/boot/grub/
