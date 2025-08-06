@@ -1,7 +1,7 @@
 TEST_IMG=schorl.img
 IMG_FILES=$(shell find ./img)
 TEST_ISO=schorl.iso
-SUB_DIR=schorl/init
+SUB_DIR=schorl/schorl
 test: testIso
 	@qemu-system-x86_64 -cdrom $(TEST_ISO) -enable-kvm -m 1G
 
