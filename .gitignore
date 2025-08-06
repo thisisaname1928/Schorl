@@ -13,3 +13,4 @@ schorl/initramfs/*
 go.sum
 initrd.gz
 initrd.cpio.gz
+schorlSysInit
