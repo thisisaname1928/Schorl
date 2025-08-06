@@ -10,3 +10,6 @@ tmpini
 *.o
 schorl/init/init
 schorl/initramfs/*
+go.sum
+initrd.gz
+initrd.cpio.gz
