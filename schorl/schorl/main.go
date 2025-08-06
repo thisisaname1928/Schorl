@@ -1,6 +1,7 @@
 package main
 
 import (
+	detectfs "Schorl/schorlSysInit/detectFs"
 	"Schorl/schorlSysInit/shell"
 	"fmt"
 	"os"
@@ -71,8 +72,8 @@ func main() {
 		return
 	}
 
-	//shell.Shell()
 	mountPseudoFs()
+	fmt.Println("TEST:", detectfs.Detect("/dev/sr0"))
 
 	// check for busybox executable
 	_, e := os.Stat("/sbin/busybox")

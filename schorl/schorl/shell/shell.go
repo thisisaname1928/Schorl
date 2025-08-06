@@ -37,7 +37,7 @@ func ExecuteShell(cmd string) bool {
 		}
 	}
 
-	if !found && len(args) > 1 {
+	if !found && args[0] != "" {
 		fmt.Println("command not found!")
 	}
 
