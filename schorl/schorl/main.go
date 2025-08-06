@@ -41,6 +41,27 @@ func mountPseudoFs() {
 	}
 }
 
+func readKernelCmdLine(tag string) string {
+	b, e := os.ReadFile("/proc/cmdline")
+	if e != nil {
+		fmt.Println(e)
+		hlt()
+	}
+
+	cmdline := string(b)
+	chunk := strings.Split(cmdline, " ")
+	for _, v := range chunk {
+		if strings.HasPrefix(v, tag) {
+			value := strings.Split(v, "=")
+			if len(value) <= 0 {
+				return ""
+			}
+			return value[len(value)-1]
+		}
+	}
+	return ""
+}
+
 func main() {
 	fmt.Println("HELLO IM SCHORL")
 
@@ -60,13 +81,17 @@ func main() {
 		hlt()
 	}
 
+	// mount real root
 	os.Mkdir("/mnt/root", 0700)
-	e = syscall.Mount("/dev/sr0", "/mnt/root", "iso9660", syscall.MS_RDONLY, "")
-	if e != nil {
-		fmt.Println(e)
+	rootDev := readKernelCmdLine("root")
+	if rootDev == "" {
+		fmt.Println("root path is empty")
 		hlt()
 	}
+	fmt.Println("Mount", rootDev)
+	syscall.Mount(rootDev, "/mnt/root", "iso9660", syscall.MS_RDONLY, "")
 	// callBusyBox("mount /dev/sr0 /mnt/root")
+	// chroot into real root
 	e = syscall.Chroot("/mnt/root")
 	if e != nil {
 		fmt.Println(e)
