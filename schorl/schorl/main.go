@@ -14,14 +14,8 @@ func hlt() {
 	}
 }
 
-func callBusyBox(fn string) {
-	e := syscall.Exec("/sbin/busybox", strings.Split(fn, " "), []string{})
-	if e != nil {
-		fmt.Printf("exec /sbin/busybox failed: %v\n", e)
-	}
-}
-
 func mountPseudoFs() {
+	// sometimes we can't mkdir on readonly fs, but we should do this to prevent some wrong things
 	os.Mkdir("/proc", 0700)
 	e := syscall.Mount("proc", "/proc", "proc", 0, "")
 	if e != nil {
@@ -40,6 +34,19 @@ func mountPseudoFs() {
 		fmt.Println("Error while mount /sys: ", e)
 		hlt()
 	}
+	os.Mkdir("/run", 0700)
+	e = syscall.Mount("tmpfs", "/run", "tmpfs", 0, "")
+	if e != nil {
+		fmt.Println("Error while mount /run: ", e)
+		hlt()
+	}
+}
+
+// unmount to delete all content of current initramfs
+func umountPseudoFs() {
+	syscall.Unmount("/dev", syscall.MNT_FORCE)
+	syscall.Unmount("/sys", syscall.MNT_FORCE)
+	syscall.Unmount("/proc", syscall.MNT_FORCE)
 }
 
 func readKernelCmdLine(tag string) string {
@@ -83,17 +90,28 @@ func main() {
 	}
 
 	// mount real root
-	os.Mkdir("/mnt/root", 0700)
+	os.Mkdir("/newRoot", 0700)
 	rootDev := readKernelCmdLine("root")
 	if rootDev == "" {
 		fmt.Println("root path is empty")
 		hlt()
 	}
+
+	// mount root
 	fmt.Println("Mount", rootDev)
-	syscall.Mount(rootDev, "/mnt/root", "iso9660", syscall.MS_RDONLY, "")
-	// callBusyBox("mount /dev/sr0 /mnt/root")
+	syscall.Mount(rootDev, "/newRoot", "iso9660", syscall.MS_RDONLY, "")
+
+	// free initramfs
+	umountPseudoFs()
+	dir, _ := os.ReadDir("/")
+	for _, v := range dir {
+		if v.Name() != "newRoot" && v.Name() != "dev" && v.Name() != "sys" && v.Name() != "proc" {
+			os.RemoveAll("/" + v.Name())
+		}
+	}
+
 	// chroot into real root
-	e = syscall.Chroot("/mnt/root")
+	e = syscall.Chroot("/newRoot")
 	if e != nil {
 		fmt.Println(e)
 	}
