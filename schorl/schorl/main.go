@@ -47,6 +47,7 @@ func umountPseudoFs() {
 	syscall.Unmount("/dev", syscall.MNT_FORCE)
 	syscall.Unmount("/sys", syscall.MNT_FORCE)
 	syscall.Unmount("/proc", syscall.MNT_FORCE)
+	syscall.Unmount("/run", syscall.MNT_FORCE)
 }
 
 func readKernelCmdLine(tag string) string {
@@ -105,7 +106,7 @@ func main() {
 	umountPseudoFs()
 	dir, _ := os.ReadDir("/")
 	for _, v := range dir {
-		if v.Name() != "newRoot" && v.Name() != "dev" && v.Name() != "sys" && v.Name() != "proc" {
+		if v.Name() != "newRoot" && v.Name() != "dev" && v.Name() != "sys" && v.Name() != "proc" && v.Name() != "run" {
 			os.RemoveAll("/" + v.Name())
 		}
 	}
