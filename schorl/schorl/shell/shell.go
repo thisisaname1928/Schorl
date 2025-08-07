@@ -12,7 +12,7 @@ type ShellCommand struct {
 	Name    string
 }
 
-var Commands = []ShellCommand{{ls, "ls"}, {cd, "cd"}, {clear, "clear"}, {cat, "cat"}, {insmod, "insmod"}}
+var Commands = []ShellCommand{{ls, "ls"}, {cd, "cd"}, {clear, "clear"}, {cat, "cat"}, {insmod, "insmod"}, {rm, "rm"}}
 
 func ExecuteShell(cmd string) bool {
 	var args []string
