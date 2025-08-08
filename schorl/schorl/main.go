@@ -1,7 +1,7 @@
 package main
 
 import (
-	detectfs "Schorl/schorlSysInit/detectFs"
+	"Schorl/schorlSysInit/log"
 	"Schorl/schorlSysInit/shell"
 	"fmt"
 	"os"
@@ -72,16 +72,14 @@ func readKernelCmdLine(tag string) string {
 }
 
 func main() {
-	fmt.Println("HELLO IM SCHORL")
-
 	if os.Getpid() != 1 {
 		fmt.Println("TEST MODE")
 		shell.Shell()
 		return
 	}
 
+	log.Log("Mounting pseudo filesystem...\n")
 	mountPseudoFs()
-	fmt.Println("TEST:", detectfs.Detect("/dev/sr0"))
 
 	// check for busybox executable
 	_, e := os.Stat("/sbin/busybox")
@@ -98,11 +96,13 @@ func main() {
 		hlt()
 	}
 
+	log.Log("Mounting root=", rootDev, "...\n")
+
 	// mount root
-	fmt.Println("Mount", rootDev)
 	syscall.Mount(rootDev, "/newRoot", "iso9660", syscall.MS_RDONLY, "")
 
 	// free initramfs
+	log.Log("Delete initramfs filesystem...\n")
 	umountPseudoFs()
 	dir, _ := os.ReadDir("/")
 	for _, v := range dir {
@@ -112,6 +112,7 @@ func main() {
 	}
 
 	// chroot into real root
+	log.Log("Going to real root...\n")
 	e = syscall.Chroot("/newRoot")
 	if e != nil {
 		fmt.Println(e)
@@ -119,7 +120,6 @@ func main() {
 
 	os.Chdir("/")
 	mountPseudoFs()
-	fmt.Println("OKOKOK now im in real root!")
 	shell.Shell()
 	hlt()
 }
