@@ -2,6 +2,7 @@ package main
 
 import (
 	"Schorl/schorlSysInit/log"
+	"Schorl/schorlSysInit/services"
 	"Schorl/schorlSysInit/shell"
 	"fmt"
 	"os"
@@ -120,6 +121,11 @@ func main() {
 
 	os.Chdir("/")
 	mountPseudoFs()
-	shell.Shell()
+
+	var h services.HotPlugService
+	e = h.Init()
+	fmt.Println(e)
+	h.Start()
+	//shell.Shell()
 	hlt()
 }
