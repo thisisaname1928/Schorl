@@ -2,6 +2,10 @@ TEST_IMG=schorl.img
 IMG_FILES=$(shell find ./img)
 TEST_ISO=schorl.iso
 SUB_DIR=schorl/schorl
+
+fasttest: initramfs
+	@qemu-system-x86_64 -kernel linux/kernel -append "quiet splash root=/dev/sr0 init=/init  modules=/modules/" -initrd img/boot/initrd.cpio.gz -drive file=$(TEST_ISO),media=cdrom
+
 test: testIso
 	@qemu-system-x86_64 -cdrom $(TEST_ISO) -enable-kvm -m 2G
 
